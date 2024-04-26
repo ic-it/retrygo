@@ -1,0 +1,32 @@
+version: "3"
+
+vars:
+  version: "0.1.0"
+  license: "MIT"
+  libname: "retrygo"
+  coverfile: "coverage.out"
+  
+tasks:
+  install-dev:
+    desc: "Install development tools"
+    cmds:
+      - go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+
+  test:
+    desc: "Run tests"
+    vars:
+      timeout: "5m"
+    cmds:
+      - go test -v -timeout {{.timeout}} -coverprofile={{.coverfile}} -covermode=atomic .
+
+  show-cover:
+    desc: "Show coverage"
+    cmds:
+      - go tool cover -html={{.coverfile}}
+  
+  doc:
+    desc: "Generate documentation"
+    vars:
+      outputdir: "docs"
+    cmds:
+      - gomarkdoc -v -o '{{.outputdir}}/README.md' .
