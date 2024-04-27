@@ -18,6 +18,13 @@ tasks:
       timeout: "5m"
     cmds:
       - go test -v -timeout {{.timeout}} -coverprofile={{.coverfile}} -covermode=atomic .
+    
+  bench:
+    desc: "Run benchmarks only"
+    vars:
+      timeout: "5m"
+    cmds:
+      - go test -v -timeout {{.timeout}} -bench=. -run=^$$ -benchmem .
 
   show-cover:
     desc: "Show coverage"
