@@ -5,30 +5,30 @@ import (
 	"time"
 )
 
-type retry[RT any] struct {
+type retry[T any] struct {
 	policy RetryPolicy
 }
 
 // Retry is the interface that wraps the Do method.
-type Retry[RT any] interface {
+type Retry[T any] interface {
 	// Do calls the given function f until it returns nil or the context is done.
-	Do(ctx context.Context, f func(context.Context) (RT, error)) (RT, error)
+	Do(ctx context.Context, f func(context.Context) (T, error)) (T, error)
 }
 
 // New creates a new Retry instance with the given RetryPolicy and configurers.
-func New[RT any](policy RetryPolicy) Retry[RT] {
-	return &retry[RT]{
+func New[T any](policy RetryPolicy) Retry[T] {
+	return &retry[T]{
 		policy: policy,
 	}
 }
 
-func (r retry[RT]) Do(ctx context.Context, f func(context.Context) (RT, error)) (RT, error) {
+func (r retry[T]) Do(ctx context.Context, f func(context.Context) (T, error)) (T, error) {
 	ri := RetryInfo{
 		Fails: 0,
 		Since: time.Now(),
 		Err:   nil,
 	}
-	var result RT
+	var result T
 	for {
 		select {
 		case <-ctx.Done():

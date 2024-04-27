@@ -49,11 +49,13 @@ func main() {
 		retrygo.Combine(
 			retrygo.Constant(1*time.Second),
 			retrygo.LimitCount(5),
-			retrygo.LimitTime(10*time.Second),
 		),
 	)
 
-	val, err := retry.Do(context.TODO(), func(context.Context) (ReturnType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	val, err := retry.Do(ctx, func(context.Context) (ReturnType, error) {
 		// Do something
 		return ReturnType{}, nil
 	})

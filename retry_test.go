@@ -116,6 +116,34 @@ func TestDoContextCancel(t *testing.T) {
 	}
 }
 
+func TestDoContextCancelBeforeDo(t *testing.T) {
+	type zero struct{}
+	// Create a retry instance with a mock RetryPolicy.
+	retry := retrygo.New[zero](
+		func(ri retrygo.RetryInfo) (bool, time.Duration) {
+			t.Log("retrying")
+			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
+		})
+
+	// Create a context with a timeout of 1 second.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	cancel()
+
+	_, err := retry.Do(ctx, func(ctx context.Context) (zero, error) {
+		return zero{}, fmt.Errorf("error")
+	})
+
+	// Check if the error is not nil.
+	if err == nil {
+		t.Error("expected error")
+	}
+
+	// Check if the error is a context canceled error.
+	if err != context.Canceled {
+		t.Error("expected context canceled error")
+	}
+}
+
 func BenchmarkDoContextCancel(b *testing.B) {
 	err := fmt.Errorf("error")
 	for _, maxFails := range []int{1, 10, 100, 1000} {
