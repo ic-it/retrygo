@@ -30,15 +30,19 @@ func TestDo(t *testing.T) {
 }
 
 func BenchmarkDo(b *testing.B) {
-	testerr := fmt.Errorf("error")
-	for i := 0; i < b.N; i++ {
-		retry := retrygo.New[int](
-			func(ri retrygo.RetryInfo) (bool, time.Duration) {
-				return ri.Fails < i, 0
-			})
+	err := fmt.Errorf("error")
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				retry := retrygo.New[int](
+					func(ri retrygo.RetryInfo) (bool, time.Duration) {
+						return ri.Fails < maxFails, 0
+					})
 
-		retry.Do(context.Background(), func(context.Context) (int, error) {
-			return 0, testerr
+				retry.Do(context.Background(), func(context.Context) (int, error) {
+					return 0, err
+				})
+			}
 		})
 	}
 }
@@ -68,14 +72,18 @@ func TestDoSuccess(t *testing.T) {
 }
 
 func BenchmarkDoSuccess(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		retry := retrygo.New[int](
-			func(ri retrygo.RetryInfo) (bool, time.Duration) {
-				return ri.Fails < i, 0
-			})
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				retry := retrygo.New[int](
+					func(ri retrygo.RetryInfo) (bool, time.Duration) {
+						return ri.Fails < maxFails, 0
+					})
 
-		retry.Do(context.Background(), func(context.Context) (int, error) {
-			return 0, nil
+				retry.Do(context.Background(), func(context.Context) (int, error) {
+					return 0, nil
+				})
+			}
 		})
 	}
 }
@@ -109,18 +117,20 @@ func TestDoContextCancel(t *testing.T) {
 }
 
 func BenchmarkDoContextCancel(b *testing.B) {
-	testerr := fmt.Errorf("error")
-	for i := 0; i < b.N; i++ {
-		retry := retrygo.New[int](
-			func(ri retrygo.RetryInfo) (bool, time.Duration) {
-				return ri.Fails < i, 0
-			})
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-
-		retry.Do(ctx, func(context.Context) (int, error) {
-			return 0, testerr
+	err := fmt.Errorf("error")
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				retry := retrygo.New[int](
+					func(ri retrygo.RetryInfo) (bool, time.Duration) {
+						return ri.Fails < maxFails, 0
+					})
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				defer cancel()
+				retry.Do(ctx, func(context.Context) (int, error) {
+					return 0, err
+				})
+			}
 		})
 	}
 }
@@ -149,17 +159,21 @@ func TestDoContextCancelSuccess(t *testing.T) {
 }
 
 func BenchmarkDoContextCancelSuccess(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		retry := retrygo.New[string](
-			func(ri retrygo.RetryInfo) (bool, time.Duration) {
-				return ri.Fails < i, 0
-			})
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				retry := retrygo.New[int](
+					func(ri retrygo.RetryInfo) (bool, time.Duration) {
+						return ri.Fails < maxFails, 0
+					})
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				defer cancel()
 
-		retry.Do(ctx, func(context.Context) (string, error) {
-			return "success", nil
+				retry.Do(ctx, func(context.Context) (int, error) {
+					return 0, nil
+				})
+			}
 		})
 	}
 }
@@ -200,17 +214,19 @@ func TestDoMultipleTimes(t *testing.T) {
 }
 
 func BenchmarkDoReuse(b *testing.B) {
-	testerr := fmt.Errorf("error")
-	var j *int = nil
-	retry := retrygo.New[int](
-		func(ri retrygo.RetryInfo) (bool, time.Duration) {
-			return ri.Fails < *j, 0
-		})
+	err := fmt.Errorf("error")
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			retry := retrygo.New[int](
+				func(ri retrygo.RetryInfo) (bool, time.Duration) {
+					return ri.Fails < maxFails, 0
+				})
 
-	for i := 0; i < b.N; i++ {
-		j = &i
-		retry.Do(context.Background(), func(context.Context) (int, error) {
-			return 0, testerr
+			for i := 0; i < b.N; i++ {
+				retry.Do(context.Background(), func(context.Context) (int, error) {
+					return 0, err
+				})
+			}
 		})
 	}
 }
