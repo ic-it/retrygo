@@ -1,4 +1,4 @@
-name: Test Go
+name: Build and push documentation
 
 on:
   push:
