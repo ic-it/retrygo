@@ -30,3 +30,9 @@ tasks:
       outputdir: "docs"
     cmds:
       - gomarkdoc -v -o '{{.outputdir}}/README.md' .
+
+  release:
+    desc: "Release a new version"
+    cmds:
+      - git tag v{{.version}}
+      - git push origin v{{.version}}
