@@ -7,14 +7,13 @@ import (
 	"github.com/ic-it/retrygo"
 )
 
-func Simple() {
+func Custom() {
 	type ReturnType struct{}
 	retry := retrygo.New[ReturnType](
-		retrygo.Combine(
-			retrygo.Constant(1*time.Second),
-			retrygo.LimitCount(5),
-			retrygo.LimitTime(10*time.Second),
-		),
+		func(ri retrygo.RetryInfo) (continueRetry bool, sleep time.Duration) {
+			// Custom logic
+			return false, 0
+		},
 	)
 
 	val, err := retry.Do(context.TODO(), func(context.Context) (ReturnType, error) {

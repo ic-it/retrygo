@@ -30,6 +30,8 @@ go get github.com/ic-it/retrygo
 
 ## Usage
 [Examples](./examples/)
+
+### Simple Example With Predefined Backoff
 ```go
 package main
 
@@ -60,6 +62,39 @@ func main() {
     }
 
     // Continue with val
+}
+```
+
+### Example with Custom Backoff
+```go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/ic-it/retrygo"
+)
+
+func main() {
+	type ReturnType struct{}
+	retry := retrygo.New[ReturnType](
+		func(ri retrygo.RetryInfo) (continueRetry bool, sleep time.Duration) {
+			// Custom logic
+			return false, 0
+		},
+	)
+
+	val, err := retry.Do(context.TODO(), func(context.Context) (ReturnType, error) {
+		// Do something
+		return ReturnType{}, nil
+	})
+
+	if err != nil {
+		// Handle error
+	}
+
+	// Continue with val
 }
 ```
 
