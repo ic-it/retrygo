@@ -1,11 +1,12 @@
 # RetryGO
+
+![Retrygo](./docs/assets/retrygo.png)
+
+---
 [![codecov](https://codecov.io/gh/ic-it/retrygo/graph/badge.svg?token=HXT5N3O452)](https://codecov.io/gh/ic-it/retrygo)
 [![Go Reference](https://pkg.go.dev/badge/github.com/ic-it/retrygo.svg)](https://pkg.go.dev/github.com/ic-it/retrygo)
 
-**RetryGO** is a simple library for retrying functions in Go. 
-
-**RetryGO** is based on giving the user control over the logic responsible for 
-deciding whether to continue retry attempts. 
+**RetryGO** is a simple and flexible library for retrying functions in Go. 
 
 ## Purpose
 The purpose of this library is to provide a simple but flexible way to retry
