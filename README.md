@@ -21,9 +21,17 @@ deciding whether to continue retrying or not.
 - **Retry Policy:** The user can specify a function that will be called after
 each retry attempt. This function will be responsible for deciding whether to
 continue retrying or not.
-- **Prepared Backoff:** The user can create its own backoff strategy or use one
-of the predefined strategies.
-- **Context:** The user can specify a context to cancel the retry attempts.
+- **Backoff:** The user can create its own retry strategy or use one
+of the predefined backoff strategies.
+
+## Features
+- **Predefined Backoff Strategies:** The library provides some predefined
+backoff strategies, such as constant, exponential, and linear backoff.
+- **Combine Backoff Strategies:** The user can combine multiple backoff
+strategies to create a custom backoff strategy.
+- **Recover:** The user can enable the recover feature, which will recover
+panics and behave as if the function returned an error.
+- **Context:** The user can use the context to cancel the retry process.
 
 ## Installation
 ```bash
