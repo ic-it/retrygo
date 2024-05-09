@@ -5,23 +5,23 @@ import (
 	"time"
 )
 
-// Retry is the interface that wraps the Do method.
+// Retry is the main type of this package.
 type Retry[T any] struct {
 	policy   RetryPolicy
 	recovery bool
 }
 
-type retryConfigurer[T any] func(*Retry[T])
+type RetryConfigurer[T any] func(*Retry[T])
 
 // WithRecovery enables the recovery mode.
-func WithRecovery[T any]() retryConfigurer[T] {
+func WithRecovery[T any]() RetryConfigurer[T] {
 	return func(r *Retry[T]) {
 		r.recovery = true
 	}
 }
 
 // New creates a new Retry instance with the given RetryPolicy and configurers.
-func New[T any](policy RetryPolicy, configurers ...retryConfigurer[T]) Retry[T] {
+func New[T any](policy RetryPolicy, configurers ...RetryConfigurer[T]) Retry[T] {
 	r := Retry[T]{
 		policy: policy,
 	}
