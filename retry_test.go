@@ -43,13 +43,12 @@ func BenchmarkDo(b *testing.B) {
 	err := fmt.Errorf("error")
 	ctx := context.Background()
 	for _, maxFails := range []int{1, 10, 100, 1000} {
+		retry := retrygo.New[int](
+			func(ri retrygo.RetryInfo) (bool, time.Duration) {
+				return ri.Fails < maxFails, 0
+			})
 		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				retry := retrygo.New[int](
-					func(ri retrygo.RetryInfo) (bool, time.Duration) {
-						return ri.Fails < maxFails, 0
-					})
-
 				retry.Do(ctx, func(context.Context) (int, error) {
 					return 0, err
 				})
@@ -90,13 +89,12 @@ func TestDoSuccess(t *testing.T) {
 func BenchmarkDoSuccess(b *testing.B) {
 	ctx := context.Background()
 	for _, maxFails := range []int{1, 10, 100, 1000} {
+		retry := retrygo.New[int](
+			func(ri retrygo.RetryInfo) (bool, time.Duration) {
+				return ri.Fails < maxFails, 0
+			})
 		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				retry := retrygo.New[int](
-					func(ri retrygo.RetryInfo) (bool, time.Duration) {
-						return ri.Fails < maxFails, 0
-					})
-
 				retry.Do(ctx, func(context.Context) (int, error) {
 					return 0, nil
 				})
@@ -219,17 +217,16 @@ func TestDoMultipleTimes(t *testing.T) {
 	}
 }
 
-func BenchmarkDoReuse(b *testing.B) {
+func BenchmarkNewDo(b *testing.B) {
 	err := fmt.Errorf("error")
 	ctx := context.Background()
 	for _, maxFails := range []int{1, 10, 100, 1000} {
 		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
-			retry := retrygo.New[int](
-				func(ri retrygo.RetryInfo) (bool, time.Duration) {
-					return ri.Fails < maxFails, 0
-				})
-
 			for i := 0; i < b.N; i++ {
+				retry := retrygo.New[int](
+					func(ri retrygo.RetryInfo) (bool, time.Duration) {
+						return ri.Fails < maxFails, 0
+					})
 				retry.Do(ctx, func(context.Context) (int, error) {
 					return 0, err
 				})

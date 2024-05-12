@@ -47,6 +47,7 @@ func (r Retry[T]) do(ctx context.Context, f func(context.Context) (T, error)) (T
 		Err:   nil,
 	}
 	var result T
+	timer := time.NewTimer(0)
 	for {
 		select {
 		case <-ctx.Done():
@@ -62,12 +63,12 @@ func (r Retry[T]) do(ctx context.Context, f func(context.Context) (T, error)) (T
 		if !continueRetry {
 			return result, ri.Err
 		}
-		if sleep > 0 {
-			select {
-			case <-time.After(sleep):
-			case <-ctx.Done():
-				return result, ctx.Err()
-			}
+		timer.Reset(sleep)
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			timer.Stop()
+			return result, ctx.Err()
 		}
 	}
 }
@@ -79,6 +80,7 @@ func (r Retry[T]) doRecovery(ctx context.Context, f func(context.Context) (T, er
 		Err:   nil,
 	}
 	var result T
+	timer := time.NewTimer(0)
 	for {
 		select {
 		case <-ctx.Done():
@@ -101,12 +103,12 @@ func (r Retry[T]) doRecovery(ctx context.Context, f func(context.Context) (T, er
 		if !continueRetry {
 			return result, ri.Err
 		}
-		if sleep > 0 {
-			select {
-			case <-time.After(sleep):
-			case <-ctx.Done():
-				return result, ctx.Err()
-			}
+		timer.Reset(sleep)
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			timer.Stop()
+			return result, ctx.Err()
 		}
 	}
 }
