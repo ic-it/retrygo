@@ -1,0 +1,31 @@
+version: "3"
+
+
+tasks:
+  bench-icit-retrygo:
+    desc: "Run benchmarks only for icit-retrygo"
+    vars:
+      timeout: "5m"
+    cmds:
+      - go test -v -timeout {{.timeout}} -bench=. -run=^$$ -benchmem ./icit-retrygo
+    
+  bench-avast-retry-go:
+    desc: "Run benchmarks only for avast-retry-go"
+    vars:
+      timeout: "5m"
+    cmds:
+      - go test -v -timeout {{.timeout}} -bench=. -run=^$$ -benchmem ./avast-retry-go
+  
+  bench-sethvargo-go-retry:
+    desc: "Run benchmarks only for sethvargo-go-retry"
+    vars:
+      timeout: "5m"
+    cmds:
+      - go test -v -timeout {{.timeout}} -bench=. -run=^$$ -benchmem ./sethvargo-go-retry
+
+  bench:
+    desc: "Run benchmarks only"
+    cmds:
+      - task bench-icit-retrygo
+      - task bench-avast-retry-go
+      - task bench-sethvargo-go-retry

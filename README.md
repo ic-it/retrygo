@@ -114,5 +114,10 @@ func main() {
 [Doumentation](./docs/) is available in the `docs` folder. This documentation
 was generated using [gomarkdoc](https://github.com/princjef/gomarkdoc).
 
+## Benchmarks
+See benchmarks [here](./benchmarks/).
+
+Results [gist](https://gist.github.com/ic-it/99a569a99772c38fafb447ba12baa19a).
+
 ## License
 [MIT](./LICENSE.txt)
