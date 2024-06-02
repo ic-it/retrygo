@@ -32,7 +32,7 @@ func BenchmarkNew(b *testing.B) {
 func BenchmarkDo(b *testing.B) {
 	ctx := context.Background()
 	for _, fails := range failsRange {
-		retry := retrygo.New[benchm.Zero](
+		retry, _ := retrygo.New[benchm.Zero](
 			func(ri retrygo.RetryInfo) (bool, time.Duration) {
 				return ri.Fails < fails, 0
 			})
@@ -50,7 +50,7 @@ func BenchmarkDo(b *testing.B) {
 func BenchmarkDoSuccess(b *testing.B) {
 	ctx := context.Background()
 	for _, fails := range failsRange {
-		retry := retrygo.New[benchm.Zero](
+		retry, _ := retrygo.New[benchm.Zero](
 			func(ri retrygo.RetryInfo) (bool, time.Duration) {
 				return ri.Fails < fails, 0
 			})
@@ -72,7 +72,7 @@ func BenchmarkNewDo(b *testing.B) {
 	for _, fails := range failsRange {
 		b.Run(fmt.Sprintf("lib=%s/fails=%d", LIB_NAME, fails), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				retry := retrygo.New[benchm.Zero](
+				retry, _ := retrygo.New[benchm.Zero](
 					func(ri retrygo.RetryInfo) (bool, time.Duration) {
 						return ri.Fails < fails, 0
 					})
@@ -87,7 +87,7 @@ func BenchmarkNewDo(b *testing.B) {
 // BenchmarkDoRecovery benchmarks the performance of the Do method with recovery.
 func BenchmarkDoRecovery(b *testing.B) {
 	for _, fails := range failsRange {
-		retry := retrygo.New(
+		retry, _ := retrygo.New(
 			func(ri retrygo.RetryInfo) (bool, time.Duration) {
 				return ri.Fails < fails, 0
 			},
