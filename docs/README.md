@@ -11,11 +11,11 @@ import "github.com/ic-it/retrygo"
 - [type ErrRecovered](<#ErrRecovered>)
   - [func \(e ErrRecovered\) Error\(\) string](<#ErrRecovered.Error>)
 - [type Retry](<#Retry>)
-  - [func New\[T any\]\(policy RetryPolicy, configurers ...RetryConfigurer\[T\]\) Retry\[T\]](<#New>)
+  - [func New\[T any\]\(policy RetryPolicy, options ...RetryOption\[T\]\) \(Retry\[T\], error\)](<#New>)
   - [func \(r Retry\[T\]\) Do\(ctx context.Context, f func\(context.Context\) \(T, error\)\) \(T, error\)](<#Retry[T].Do>)
-- [type RetryConfigurer](<#RetryConfigurer>)
-  - [func WithRecovery\[T any\]\(\) RetryConfigurer\[T\]](<#WithRecovery>)
 - [type RetryInfo](<#RetryInfo>)
+- [type RetryOption](<#RetryOption>)
+  - [func WithRecovery\[T any\]\(\) RetryOption\[T\]](<#WithRecovery>)
 - [type RetryPolicy](<#RetryPolicy>)
   - [func Combine\(policies ...RetryPolicy\) RetryPolicy](<#Combine>)
   - [func Constant\(interval time.Duration\) RetryPolicy](<#Constant>)
@@ -59,10 +59,10 @@ type Retry[T any] struct {
 ### func New
 
 ```go
-func New[T any](policy RetryPolicy, configurers ...RetryConfigurer[T]) Retry[T]
+func New[T any](policy RetryPolicy, options ...RetryOption[T]) (Retry[T], error)
 ```
 
-New creates a new Retry instance with the given RetryPolicy and configurers.
+New creates a new Retry instance with the given RetryPolicy and RetryOptions.
 
 <a name="Retry[T].Do"></a>
 ### func \(Retry\[T\]\) Do
@@ -72,24 +72,6 @@ func (r Retry[T]) Do(ctx context.Context, f func(context.Context) (T, error)) (T
 ```
 
 Do calls the given function f until it returns nil error or the context is done.
-
-<a name="RetryConfigurer"></a>
-## type RetryConfigurer
-
-
-
-```go
-type RetryConfigurer[T any] func(*Retry[T])
-```
-
-<a name="WithRecovery"></a>
-### func WithRecovery
-
-```go
-func WithRecovery[T any]() RetryConfigurer[T]
-```
-
-WithRecovery enables the recovery mode.
 
 <a name="RetryInfo"></a>
 ## type RetryInfo
@@ -103,6 +85,26 @@ type RetryInfo struct {
     Since time.Time // Since is the time when the retry started
 }
 ```
+
+<a name="RetryOption"></a>
+## type RetryOption
+
+type RetryOption\[T any\] func\(\*Retry\[T\]\)
+
+```go
+type RetryOption[T any] interface {
+    // contains filtered or unexported methods
+}
+```
+
+<a name="WithRecovery"></a>
+### func WithRecovery
+
+```go
+func WithRecovery[T any]() RetryOption[T]
+```
+
+WithRecovery enables the recovery mode.
 
 <a name="RetryPolicy"></a>
 ## type RetryPolicy

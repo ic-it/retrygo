@@ -22,7 +22,7 @@ func BenchmarkNew(b *testing.B) {
 func TestDo(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -43,7 +43,7 @@ func BenchmarkDo(b *testing.B) {
 	err := fmt.Errorf("error")
 	ctx := context.Background()
 	for _, maxFails := range []int{1, 10, 100, 1000} {
-		retry := retrygo.New[int](
+		retry, _ := retrygo.New[int](
 			func(ri retrygo.RetryInfo) (bool, time.Duration) {
 				return ri.Fails < maxFails, 0
 			})
@@ -59,7 +59,7 @@ func BenchmarkDo(b *testing.B) {
 
 func TestDoSuccess(t *testing.T) {
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[string](
+	retry, _ := retrygo.New[string](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -89,7 +89,7 @@ func TestDoSuccess(t *testing.T) {
 func BenchmarkDoSuccess(b *testing.B) {
 	ctx := context.Background()
 	for _, maxFails := range []int{1, 10, 100, 1000} {
-		retry := retrygo.New[int](
+		retry, _ := retrygo.New[int](
 			func(ri retrygo.RetryInfo) (bool, time.Duration) {
 				return ri.Fails < maxFails, 0
 			})
@@ -106,7 +106,7 @@ func BenchmarkDoSuccess(b *testing.B) {
 func TestDoContextCancel(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -134,7 +134,7 @@ func TestDoContextCancel(t *testing.T) {
 func TestDoContextCancelBeforeDo(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -161,7 +161,7 @@ func TestDoContextCancelBeforeDo(t *testing.T) {
 
 func TestDoContextCancelSuccess(t *testing.T) {
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[string](
+	retry, _ := retrygo.New[string](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -185,7 +185,7 @@ func TestDoContextCancelSuccess(t *testing.T) {
 func TestDoMultipleTimes(t *testing.T) {
 	ctx := context.Background()
 	// Create a retry instance with a mock RetryPolicy.
-	retry := retrygo.New[string](
+	retry, _ := retrygo.New[string](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying")
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -223,7 +223,7 @@ func BenchmarkNewDo(b *testing.B) {
 	for _, maxFails := range []int{1, 10, 100, 1000} {
 		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				retry := retrygo.New[int](
+				retry, _ := retrygo.New[int](
 					func(ri retrygo.RetryInfo) (bool, time.Duration) {
 						return ri.Fails < maxFails, 0
 					})
@@ -239,7 +239,7 @@ func BenchmarkNewDo(b *testing.B) {
 func TestDoRecovery(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy and recovery mode enabled.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying", ri.Err)
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -262,7 +262,7 @@ func BenchmarkDoRecovery(b *testing.B) {
 	for _, maxFails := range []int{1, 10, 100, 1000} {
 		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				retry := retrygo.New[int](
+				retry, _ := retrygo.New[int](
 					func(ri retrygo.RetryInfo) (bool, time.Duration) {
 						return ri.Fails < maxFails, 0
 					},
@@ -279,7 +279,7 @@ func BenchmarkDoRecovery(b *testing.B) {
 
 func TestDoRecoverySuccess(t *testing.T) {
 	// Create a retry instance with a mock RetryPolicy and recovery mode enabled.
-	retry := retrygo.New[string](
+	retry, _ := retrygo.New[string](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying", ri.Err)
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -313,7 +313,7 @@ func TestDoRecoverySuccess(t *testing.T) {
 func TestDoRecoveryContextCancel(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy and recovery mode enabled.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying", ri.Err)
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
@@ -343,7 +343,7 @@ func TestDoRecoveryContextCancel(t *testing.T) {
 func TestDoRecoveryContextCancelBeforeDo(t *testing.T) {
 	type zero struct{}
 	// Create a retry instance with a mock RetryPolicy and recovery mode enabled.
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		func(ri retrygo.RetryInfo) (bool, time.Duration) {
 			t.Log("retrying", ri.Err)
 			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second

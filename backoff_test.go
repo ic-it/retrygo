@@ -15,7 +15,7 @@ func TestLimitCount(t *testing.T) {
 	type zero struct{}
 	const countLimit = 3
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.LimitCount(countLimit),
 	)
 	retryCount := 0
@@ -37,7 +37,7 @@ func TestLimitTime(t *testing.T) {
 	const testTolerance = 100 * time.Millisecond
 	const timeLimit = 3 * time.Second
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.LimitTime(timeLimit),
 	)
 	start := time.Now()
@@ -61,7 +61,7 @@ func TestCombine(t *testing.T) {
 	const countLimit = 3
 	const timeLimit = 3 * time.Second
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.Combine(
 			retrygo.LimitCount(countLimit),
 			retrygo.LimitCount(5),
@@ -90,7 +90,7 @@ func TestConstant(t *testing.T) {
 	const expectedDuration = 4 * time.Second
 	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.Combine(
 			retrygo.Constant(interval),
 			retrygo.LimitCount(countLimit),
@@ -123,7 +123,7 @@ func TestLinear(t *testing.T) {
 	const expectedDuration = 6 * time.Second
 	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.Combine(
 			retrygo.Linear(interval),
 			retrygo.LimitCount(countLimit),
@@ -156,7 +156,7 @@ func TestExponential(t *testing.T) {
 	const expectedDuration = 14 * time.Second
 	const countLimit = 4 // Due to the fact that the last retry doesn't do sleep
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.Combine(
 			retrygo.Exponential(interval),
 			retrygo.LimitCount(countLimit),
@@ -189,7 +189,7 @@ func TestJitter(t *testing.T) {
 	const expectedDuration = 4 * time.Second
 	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
 
-	retry := retrygo.New[zero](
+	retry, _ := retrygo.New[zero](
 		retrygo.Combine(
 			retrygo.Jitter(interval),
 			retrygo.LimitCount(countLimit),

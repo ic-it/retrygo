@@ -9,7 +9,7 @@ import (
 
 func Simple() {
 	type ReturnType struct{}
-	retry := retrygo.New[ReturnType](
+	retry, _ := retrygo.New[ReturnType](
 		retrygo.Combine(
 			retrygo.Constant(1*time.Second),
 			retrygo.LimitCount(5),

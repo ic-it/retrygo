@@ -11,24 +11,41 @@ type Retry[T any] struct {
 	recovery bool
 }
 
-type RetryConfigurer[T any] func(*Retry[T])
+// type RetryOption[T any] func(*Retry[T])
+type RetryOption[T any] interface {
+	apply(*Retry[T]) error
+}
+
+// option[T any] is a type adapter for RetryOption[T].
+type option[T any] struct {
+	f func(*Retry[T]) error
+}
+
+func (o option[T]) apply(r *Retry[T]) error {
+	return o.f(r)
+}
 
 // WithRecovery enables the recovery mode.
-func WithRecovery[T any]() RetryConfigurer[T] {
-	return func(r *Retry[T]) {
-		r.recovery = true
+func WithRecovery[T any]() RetryOption[T] {
+	return option[T]{
+		f: func(r *Retry[T]) error {
+			r.recovery = true
+			return nil
+		},
 	}
 }
 
-// New creates a new Retry instance with the given RetryPolicy and configurers.
-func New[T any](policy RetryPolicy, configurers ...RetryConfigurer[T]) Retry[T] {
+// New creates a new Retry instance with the given RetryPolicy and RetryOptions.
+func New[T any](policy RetryPolicy, options ...RetryOption[T]) (Retry[T], error) {
 	r := Retry[T]{
 		policy: policy,
 	}
-	for _, c := range configurers {
-		c(&r)
+	for _, opt := range options {
+		if err := opt.apply(&r); err != nil {
+			return r, err
+		}
 	}
-	return r
+	return r, nil
 }
 
 // Do calls the given function f until it returns nil error or the context is done.
@@ -67,7 +84,6 @@ func (r Retry[T]) do(ctx context.Context, f func(context.Context) (T, error)) (T
 		select {
 		case <-timer.C:
 		case <-ctx.Done():
-			timer.Stop()
 			return result, ctx.Err()
 		}
 	}

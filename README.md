@@ -54,12 +54,16 @@ import (
 
 func main() {
 	type ReturnType struct{}
-	retry := retrygo.New[ReturnType](
+	retry, err := retrygo.New[ReturnType](
 		retrygo.Combine(
 			retrygo.Constant(1*time.Second),
 			retrygo.LimitCount(5),
 		),
 	)
+
+	if err != nil {
+		// Handle error
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -90,12 +94,16 @@ import (
 
 func main() {
 	type ReturnType struct{}
-	retry := retrygo.New[ReturnType](
+	retry, err := retrygo.New[ReturnType](
 		func(ri retrygo.RetryInfo) (continueRetry bool, sleep time.Duration) {
 			// Custom logic
 			return false, 0
 		},
 	)
+
+	if err != nil {
+		// Handle error
+	}
 
 	val, err := retry.Do(context.TODO(), func(context.Context) (ReturnType, error) {
 		// Do something

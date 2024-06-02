@@ -9,7 +9,7 @@ import (
 
 func Custom() {
 	type ReturnType struct{}
-	retry := retrygo.New[ReturnType](
+	retry, _ := retrygo.New[ReturnType](
 		func(ri retrygo.RetryInfo) (continueRetry bool, sleep time.Duration) {
 			// Custom logic
 			return false, 0
