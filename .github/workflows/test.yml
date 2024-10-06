@@ -2,8 +2,8 @@ name: Test Go
 
 on:
   push:
-    tags:
-      -v*
+    branches:
+      - main
   pull_request:
 
 jobs:
