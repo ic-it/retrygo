@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+type zero struct{}
+
 // Retry is the main type of this package.
 type Retry[T any] struct {
 	policy   RetryPolicy
@@ -48,6 +50,11 @@ func New[T any](policy RetryPolicy, options ...RetryOption[T]) (Retry[T], error)
 	return r, nil
 }
 
+// NewZero creates a new Retry instance with no return value.
+func NewZero(policy RetryPolicy, options ...RetryOption[zero]) (Retry[zero], error) {
+	return New(policy, options...)
+}
+
 // Do calls the given function f until it returns nil error or the context is done.
 func (r Retry[T]) Do(ctx context.Context, f func(context.Context) (T, error)) (T, error) {
 	if !r.recovery {
@@ -55,6 +62,17 @@ func (r Retry[T]) Do(ctx context.Context, f func(context.Context) (T, error)) (T
 	} else {
 		return r.doRecovery(ctx, f)
 	}
+}
+
+// DoZero calls the given function f until it returns nil error or the context is done.
+func (r Retry[T]) DoZero(ctx context.Context, f func(context.Context) error) error {
+	// fw is a function wrapper for f.
+	fw := func(ctx context.Context) (T, error) {
+		var zeroValue T
+		return zeroValue, f(ctx)
+	}
+	_, err := r.Do(ctx, fw)
+	return err
 }
 
 func (r Retry[T]) do(ctx context.Context, f func(context.Context) (T, error)) (T, error) {

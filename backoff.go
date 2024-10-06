@@ -31,7 +31,7 @@ func Linear(interval time.Duration) RetryPolicy {
 // Sleep formula: interval * 2^fails
 func Exponential(interval time.Duration) RetryPolicy {
 	return func(ri RetryInfo) (bool, time.Duration) {
-		return true, interval * time.Duration(1<<uint(ri.Fails))
+		return true, interval * time.Duration(1<<uint(ri.Fails-1))
 	}
 }
 

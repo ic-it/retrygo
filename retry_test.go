@@ -57,6 +57,43 @@ func BenchmarkDo(b *testing.B) {
 	}
 }
 
+func TestDoZero(t *testing.T) {
+	// Create a retry instance with a mock RetryPolicy.
+	retry, _ := retrygo.NewZero(
+		func(ri retrygo.RetryInfo) (bool, time.Duration) {
+			t.Log("retrying")
+			return ri.Fails < 3, time.Duration(ri.Fails) * time.Second
+		})
+
+	// Call the DoZero method with a mock function that returns an error after 3 calls.
+	err := retry.DoZero(context.Background(), func(context.Context) error {
+		return fmt.Errorf("error")
+	})
+
+	// Check if the error is not nil.
+	if err == nil {
+		t.Error("expected error")
+	}
+}
+
+func BenchmarkDoZero(b *testing.B) {
+	err := fmt.Errorf("error")
+	ctx := context.Background()
+	for _, maxFails := range []int{1, 10, 100, 1000} {
+		retry, _ := retrygo.NewZero(
+			func(ri retrygo.RetryInfo) (bool, time.Duration) {
+				return ri.Fails < maxFails, 0
+			})
+		b.Run(fmt.Sprintf("maxFails=%d", maxFails), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				retry.DoZero(ctx, func(context.Context) error {
+					return err
+				})
+			}
+		})
+	}
+}
+
 func TestDoSuccess(t *testing.T) {
 	// Create a retry instance with a mock RetryPolicy.
 	retry, _ := retrygo.New[string](

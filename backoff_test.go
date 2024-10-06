@@ -84,132 +84,66 @@ func TestCombine(t *testing.T) {
 
 // Test Constant
 func TestConstant(t *testing.T) {
-	type zero struct{}
-	const testTolerance = 100 * time.Millisecond
-	const interval = 2 * time.Second // 2 + 2 = 4 seconds
-	const expectedDuration = 4 * time.Second
-	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
+	const interval = 2 * time.Second
 
-	retry, _ := retrygo.New[zero](
-		retrygo.Combine(
-			retrygo.Constant(interval),
-			retrygo.LimitCount(countLimit),
-		),
-	)
-	retryCount := 0
-	start := time.Now()
-	_, err := retry.Do(context.TODO(), func(context.Context) (zero, error) {
-		retryCount++
-		return zero{}, fmt.Errorf("error")
-	})
-	end := time.Now()
-	if err == nil {
-		t.Error("expected error")
-	}
-	if retryCount != countLimit {
-		t.Errorf("expected %d retries, got %d", countLimit, retryCount)
-	}
-	duration := end.Sub(start).Milliseconds()
-	if math.Abs(float64(duration-expectedDuration.Milliseconds())) > float64(testTolerance.Milliseconds()) {
-		t.Errorf("expected %s(+/-%d), got %s", expectedDuration, testTolerance, end.Sub(start))
+	requiredValues := []time.Duration{2 * time.Second, 2 * time.Second, 2 * time.Second, 2 * time.Second}
+
+	backoff := retrygo.Constant(interval)
+	info := retrygo.RetryInfo{Fails: 1}
+	for _, expectedValue := range requiredValues {
+		_, sleep := backoff(info)
+		if sleep != expectedValue {
+			t.Errorf("expected %s, got %s", expectedValue, sleep)
+		}
+		info.Fails++
 	}
 }
 
 // Test Linear
 func TestLinear(t *testing.T) {
-	type zero struct{}
-	const testTolerance = 100 * time.Millisecond
-	const interval = 2 * time.Second // 2 + 4 = 6 seconds
-	const expectedDuration = 6 * time.Second
-	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
+	const interval = 2 * time.Second
 
-	retry, _ := retrygo.New[zero](
-		retrygo.Combine(
-			retrygo.Linear(interval),
-			retrygo.LimitCount(countLimit),
-		),
-	)
-	retryCount := 0
-	start := time.Now()
-	_, err := retry.Do(context.TODO(), func(context.Context) (zero, error) {
-		retryCount++
-		return zero{}, fmt.Errorf("error")
-	})
-	end := time.Now()
-	if err == nil {
-		t.Error("expected error")
-	}
-	if retryCount != countLimit {
-		t.Errorf("expected %d retries, got %d", countLimit, retryCount)
-	}
-	duration := end.Sub(start).Milliseconds()
-	if math.Abs(float64(duration-expectedDuration.Milliseconds())) > float64(testTolerance.Milliseconds()) {
-		t.Errorf("expected %s(+/-%s), got %s", expectedDuration, testTolerance, end.Sub(start))
+	requiredValues := []time.Duration{2 * time.Second, 4 * time.Second, 6 * time.Second, 8 * time.Second}
+
+	backoff := retrygo.Linear(interval)
+	info := retrygo.RetryInfo{Fails: 1}
+	for _, expectedValue := range requiredValues {
+		_, sleep := backoff(info)
+		if sleep != expectedValue {
+			t.Errorf("expected %s, got %s", expectedValue, sleep)
+		}
+		info.Fails++
 	}
 }
 
 // Test Exponential
 func TestExponential(t *testing.T) {
-	type zero struct{}
-	const testTolerance = 100 * time.Millisecond
-	const interval = 1 * time.Second // 2 + 4 + 8 = 14 seconds
-	const expectedDuration = 14 * time.Second
-	const countLimit = 4 // Due to the fact that the last retry doesn't do sleep
+	const interval = 2 * time.Second
 
-	retry, _ := retrygo.New[zero](
-		retrygo.Combine(
-			retrygo.Exponential(interval),
-			retrygo.LimitCount(countLimit),
-		),
-	)
-	retryCount := 0
-	start := time.Now()
-	_, err := retry.Do(context.TODO(), func(context.Context) (zero, error) {
-		retryCount++
-		return zero{}, fmt.Errorf("error")
-	})
-	end := time.Now()
-	if err == nil {
-		t.Error("expected error")
-	}
-	if retryCount != countLimit {
-		t.Errorf("expected %d retries, got %d", countLimit, retryCount)
-	}
-	duration := end.Sub(start).Milliseconds()
-	if math.Abs(float64(duration-expectedDuration.Milliseconds())) > float64(testTolerance.Milliseconds()) {
-		t.Errorf("expected %s(+/-%s), got %s", expectedDuration, testTolerance, end.Sub(start))
+	requiredValues := []time.Duration{2 * time.Second, 4 * time.Second, 8 * time.Second, 16 * time.Second}
+
+	backoff := retrygo.Exponential(interval)
+	info := retrygo.RetryInfo{Fails: 1}
+	for _, expectedValue := range requiredValues {
+		_, sleep := backoff(info)
+		if sleep != expectedValue {
+			t.Errorf("expected %s, got %s", expectedValue, sleep)
+		}
+		info.Fails++
 	}
 }
 
 // Test Jitter
 func TestJitter(t *testing.T) {
-	type zero struct{}
-	const testTolerance = 4 * time.Second
-	const interval = 2 * time.Second // 2(+[0,2)) + 2(+[0,2)) = 4(+[0,4)) seconds
-	const expectedDuration = 4 * time.Second
-	const countLimit = 3 // Due to the fact that the last retry doesn't do sleep
+	const interval = 2 * time.Second
 
-	retry, _ := retrygo.New[zero](
-		retrygo.Combine(
-			retrygo.Jitter(interval),
-			retrygo.LimitCount(countLimit),
-		),
-	)
-	retryCount := 0
-	start := time.Now()
-	_, err := retry.Do(context.TODO(), func(context.Context) (zero, error) {
-		retryCount++
-		return zero{}, fmt.Errorf("error")
-	})
-	end := time.Now()
-	if err == nil {
-		t.Error("expected error")
-	}
-	if retryCount != countLimit {
-		t.Errorf("expected %d retries, got %d", countLimit, retryCount)
-	}
-	duration := end.Sub(start).Milliseconds()
-	if math.Abs(float64(duration-expectedDuration.Milliseconds())) > float64(testTolerance.Milliseconds()) {
-		t.Errorf("expected %s(+/-%s), got %s", expectedDuration, testTolerance, end.Sub(start))
+	backoff := retrygo.Jitter(interval)
+	info := retrygo.RetryInfo{Fails: 1}
+	for i := 0; i < 100; i++ {
+		_, sleep := backoff(info)
+		if sleep < interval || sleep > interval*2 {
+			t.Errorf("expected %s to %s, got %s", interval, interval*2, sleep)
+		}
+		info.Fails++
 	}
 }
