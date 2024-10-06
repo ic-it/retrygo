@@ -12,7 +12,9 @@ import "github.com/ic-it/retrygo"
   - [func \(e ErrRecovered\) Error\(\) string](<#ErrRecovered.Error>)
 - [type Retry](<#Retry>)
   - [func New\[T any\]\(policy RetryPolicy, options ...RetryOption\[T\]\) \(Retry\[T\], error\)](<#New>)
+  - [func NewZero\(policy RetryPolicy, options ...RetryOption\[zero\]\) \(Retry\[zero\], error\)](<#NewZero>)
   - [func \(r Retry\[T\]\) Do\(ctx context.Context, f func\(context.Context\) \(T, error\)\) \(T, error\)](<#Retry[T].Do>)
+  - [func \(r Retry\[T\]\) DoZero\(ctx context.Context, f func\(context.Context\) error\) error](<#Retry[T].DoZero>)
 - [type RetryInfo](<#RetryInfo>)
 - [type RetryOption](<#RetryOption>)
   - [func WithRecovery\[T any\]\(\) RetryOption\[T\]](<#WithRecovery>)
@@ -64,6 +66,15 @@ func New[T any](policy RetryPolicy, options ...RetryOption[T]) (Retry[T], error)
 
 New creates a new Retry instance with the given RetryPolicy and RetryOptions.
 
+<a name="NewZero"></a>
+### func NewZero
+
+```go
+func NewZero(policy RetryPolicy, options ...RetryOption[zero]) (Retry[zero], error)
+```
+
+NewZero creates a new Retry instance with no return value.
+
 <a name="Retry[T].Do"></a>
 ### func \(Retry\[T\]\) Do
 
@@ -72,6 +83,15 @@ func (r Retry[T]) Do(ctx context.Context, f func(context.Context) (T, error)) (T
 ```
 
 Do calls the given function f until it returns nil error or the context is done.
+
+<a name="Retry[T].DoZero"></a>
+### func \(Retry\[T\]\) DoZero
+
+```go
+func (r Retry[T]) DoZero(ctx context.Context, f func(context.Context) error) error
+```
+
+DoZero calls the given function f until it returns nil error or the context is done.
 
 <a name="RetryInfo"></a>
 ## type RetryInfo

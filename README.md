@@ -81,6 +81,52 @@ func main() {
 }
 ```
 
+**Note:** If you don't want to get any value from a function, NewZero and DoZero should be a solution for you:
+
+```go
+func main() {
+	retry, err := retrygo.NewZero(
+		retrygo.Combine(
+			retrygo.Constant(1*time.Second),
+			retrygo.LimitCount(5),
+		),
+	)
+
+	// Do something
+
+	err := retry.DoZero(ctx, func(context.Context) error {
+		// Do something
+		return nil
+	})
+
+	// Handle error if needed
+}
+```
+
+**Its also possible to use DoZero with New function:**
+```go
+func main() {
+	type ReturnType struct{}
+	retry, err := retrygo.New[ReturnType](
+		retrygo.Combine(
+			retrygo.Constant(1*time.Second),
+			retrygo.LimitCount(5),
+		),
+	)
+
+	// Do something
+
+	err := retry.DoZero(ctx, func(context.Context) error {
+		// Do something
+		return nil
+	})
+
+	// Handle error if needed
+}
+```
+
+**Important:** You can't use Do with NewZero.
+
 ### Example with Custom Backoff
 ```go
 package main

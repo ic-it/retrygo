@@ -30,3 +30,23 @@ func Simple() {
 	// Continue with val
 	_ = val
 }
+
+func SimpleZero() {
+	retry, _ := retrygo.NewZero(
+		retrygo.Combine(
+			retrygo.Constant(0),
+			retrygo.LimitCount(0),
+			retrygo.LimitTime(0),
+		),
+	)
+
+	err := retry.DoZero(context.TODO(), func(context.Context) error {
+		// Do something
+		return nil
+	})
+
+	if err != nil {
+		// Handle error
+		return
+	}
+}
