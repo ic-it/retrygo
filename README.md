@@ -73,11 +73,11 @@ func main() {
 		return ReturnType{}, nil
 	})
 
-    if err != nil {
-        // Handle error
-    }
+	if err != nil {
+		// Handle error
+	}
 
-    // Continue with val
+	// Continue with val
 }
 ```
 
