@@ -125,7 +125,8 @@ func main() {
 }
 ```
 
-**Important:** You can't use Do with NewZero.
+> [!IMPORTANT]  
+> You can't use Do with NewZero.
 
 ### Example with Custom Backoff
 ```go
